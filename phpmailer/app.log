@@ -1,0 +1,5 @@
+utente inserito correttamente
+utente inserito correttamente
+Errore di scrittura della tabella: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '' at line 1
+Errore di scrittura della tabella: SQLSTATE[21000]: Cardinality violation: 1241 Operand should contain 1 column(s)utente inserito correttamenteutente inserito correttamente
+2026-04-15 09:18:01 Errore di scrittura della tabella donazioni: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SEECT utente.id, utente.email, donazione.importo, donazione.data_donazione FR...' at line 1utente inserito correttamenteutente inserito correttamenteutente inserito correttamenteutente inserito correttamenteutente inserito correttamente
