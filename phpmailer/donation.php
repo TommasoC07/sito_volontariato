@@ -3,12 +3,15 @@ session_start();
 if(!isset($_SESSION['user_id'])){
     header("Location: login.php");
     exit();
+}else if($_SESSION['user_ruolo'] !== "admin"){
+    header("Location: dashboard.php");
+    exit();
 }
 require_once('assets\mailhandler.php');
 require_once __DIR__ . '\utility.php';
 
 try{
-$sql = "SELECT utente.id, utente.email, donazione.importo, donazione.data_donazione FROM utente INNER JOIN donazione ON utente.id = donazione.id_utente";
+$sql = "SELECT utente.id, utente.nome, utente.cognome, utente.email, donazione.importo, donazione.data_donazione FROM utente INNER JOIN donazione ON utente.id = donazione.id_utente";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([]);
 
@@ -17,6 +20,8 @@ $sql = "SELECT utente.id, utente.email, donazione.importo, donazione.data_donazi
     while($user = $stmt->fetch(PDO::FETCH_ASSOC)){
         $table .= " <tr>
         <td>" . $user["id"] . "</td>
+        <td>" . $user["nome"] . "</td>
+        <td>" . $user["cognome"] . "</td>
         <td>" . $user["email"] . "</td>
         <td>" . $user["importo"] . "</td>
         <td>" . $user["data_donazione"]. "</td></tr>";
@@ -28,7 +33,7 @@ $sql = "SELECT utente.id, utente.email, donazione.importo, donazione.data_donazi
 }
 
 try{
-$sql = "SELECT email FROM utente WHERE id IN (SELECT id_utente FROM donazione WHERE data_donazione > NOW() - INTERVAL 10 DAY)";
+$sql = "SELECT nome, cognome, email FROM utente WHERE id IN (SELECT id_utente FROM donazione WHERE data_donazione > NOW() - INTERVAL 10 DAY)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([]);
 
@@ -36,6 +41,8 @@ $sql = "SELECT email FROM utente WHERE id IN (SELECT id_utente FROM donazione WH
     
     while($user = $stmt->fetch(PDO::FETCH_ASSOC)){
         $table2 .= " <tr>
+        <td>" . $user["nome"] . "</td>
+        <td>" . $user["cognome"] . "</td>
         <td>" . $user["email"] . "</td></tr>";
     }
 }catch(PDOException $e) {
@@ -45,7 +52,7 @@ $sql = "SELECT email FROM utente WHERE id IN (SELECT id_utente FROM donazione WH
 }
 
 try{
-$sql = "SELECT utente.email, SUM(donazione.importo) AS totale_donato FROM utente INNER JOIN donazione ON utente.id = donazione.id_utente GROUP BY utente.email";
+$sql = "SELECT utente.nome, utente.cognome, utente.email, SUM(donazione.importo) AS totale_donato FROM utente INNER JOIN donazione ON utente.id = donazione.id_utente GROUP BY utente.email";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([]);
 
@@ -79,6 +86,8 @@ $title = 'donation';
 <div class="container">
 <?php echo "<table class='table table-striped'>
 <th>id</th>
+<th>nome</th>
+<th>cognome</th>
 <th>email</th>
 <th>importo</th>
 <th>data</th>
@@ -93,10 +102,12 @@ $title = 'donation';
 
 <div class="container">
 <?php echo "<table class='table table-striped'>
+<th>nome</th>
+<th>cognome</th>
 <th>email</th>
 " . $table2 . "
 </table>" ?>
-
+</div>
 <hr>
 <div>
     <h1>Donazioni totali</h1>
@@ -104,7 +115,9 @@ $title = 'donation';
 
 <div class="container">
 <?php echo "<table class='table table-striped'>
-<th>email</th><th>importo totale</th>
+<th>nome</th><th>cognome</th>
+<th>email</th>
+<th>importo totale</th>
 " . $table3 . "
 </table>" ?>
 </div>
