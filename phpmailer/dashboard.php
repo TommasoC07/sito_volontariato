@@ -3,6 +3,9 @@ session_start();
 if(!isset($_SESSION['user_id'])){
     header("Location: login.php");
     exit();
+}else if($_SESSION['user_ruolo'] !== "user"){
+    header("Location: usermanager.php");
+    exit();
 }
 
 require_once __DIR__.'\utility.php';
@@ -49,7 +52,7 @@ echo $header;
         <form action="dashboard.php" method="post">
             <div class="mb-3 mt-3">
                 <label class="form-label" for="donation">Importo:</label><br>
-                <input type="number" name="donation" id="donation" placeholder="€"><br>
+                <input type="number" name="donation" id="donation" placeholder="€" min="0" step="0.01"><br>
             </div>
             <input type="submit" class="btn btn-primary" value="Submit">
             </form>
