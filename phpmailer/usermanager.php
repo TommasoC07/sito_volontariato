@@ -3,6 +3,9 @@ session_start();
 if(!isset($_SESSION['user_id'])){
     header("Location: login.php");
     exit();
+}else if($_SESSION['user_ruolo'] !== "admin"){
+    header("Location: dashboard.php");
+    exit();
 }
 
 require_once('assets\mailhandler.php');
@@ -13,15 +16,19 @@ if($_SERVER["REQUEST_METHOD"]==="POST" && isset($_POST['emaillog'])){
     $email = $_POST['emaillog'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $ruolo =  $_POST['ruolo'];
+    $nome = $_POST['nome'];
+    $cognome = $_POST['cognome'];
 
     try{
     $oggetto = "Conferma Registrazione";
     $messaggio = "<h1>Sei stato registrato!</h1>";
     //inviaEmail($email, $oggetto, $messaggio);
 
-    $sql = "INSERT INTO utente (email, passkey, ruolo) VALUES (:email, :pass, :ruolo) ";
+    $sql = "INSERT INTO utente (nome, cognome, email, passkey, ruolo) VALUES (:nome, :cognome, :email, :pass, :ruolo) ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
+    'nome' => $nome,
+    'cognome' => $cognome,
     'email' => $email,
     'pass'  => $password,
     'ruolo' => $ruolo
@@ -58,10 +65,12 @@ if($_SERVER["REQUEST_METHOD"]==="POST" && isset($_POST['id_update'])){
     $newemail = $_POST['newemail'];
 
 try{
-    $sql = "UPDATE utente SET email = (:email) WHERE id = (:id) ";
+    $sql = "UPDATE utente SET email = (:email), nome = (:nome), cognome = (:cognome) WHERE id = (:id) ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
     'email' => $newemail,
+    'nome' => $_POST['newnome'],
+    'cognome' => $_POST['newcognome'],
     'id' => $id
 ]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -81,7 +90,9 @@ $sql = "SELECT * FROM utente";
     
     while($user = $stmt->fetch(PDO::FETCH_ASSOC)){
         $table .= " <form action=usermanager.php method='post'><tr>
-        <td><input type='hidden' name='id_update' value='" . $user["id"] . "'>" . $user["id"] . "</td>
+        <td><input type='hidden' name='id_update' value='" . $user["id"] . "'>" . $user["id"] ."</td>
+        <td> <input type='text' name='newnome' value='" . $user["nome"] . "' class='form-control form-control-sm' style='width:150px' required></td>
+        <td> <input type='text' name='newcognome' value='" . $user["cognome"] . "' class='form-control form-control-sm' style='width:150px' required></td>
         <td> <input type='email' name='newemail' value='" . $user["email"] . "' class='form-control form-control-sm' style='width:150px' required></td>
         <td>" . $user["ruolo"] . "</td>
         <td class='colonna-azioni'>" . 
@@ -100,7 +111,7 @@ $sql = "SELECT * FROM utente";
 
     <br>
     <div class="d-flex">
-<a href="donation.php" class="btn btn-primary"> DONAZIONI </a>
+<a href="donation.php" class="btn btn-primary"><i class="bi bi-cash-coin"></i> DONAZIONI </a>
 <a href="logout.php" class="btn btn-primary ms-auto"><i class="bi bi-person-circle"></i> LOGOUT</a>
 </div>
 <hr>
@@ -114,6 +125,8 @@ $sql = "SELECT * FROM utente";
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
                     <th>Email</th>
                     <th>Ruolo</th>
                     <th class="text-center">Azioni</th>
@@ -139,10 +152,19 @@ $sql = "SELECT * FROM utente";
     <div class="card">
     <div class="card-body">
         <form action="usermanager.php" method="post">
+            <div class="mb-3 mt-3">
+                    <label class="form-label" for="nome">Nome:</label><br>
+                    <input type="text" name="nome" id="nome" class="form-control" style="max-width: 300px;" required><br>
+                </div>
+                <div class="mb-3 mt-3">
+                    <label class="form-label" for="cognome">Cognome:</label><br>
+                    <input type="text" name="cognome" id="cognome" class="form-control" style="max-width: 300px;" required><br>
+                </div>
                 <div class="mb-3 mt-3">
                     <label class="form-label" for="emaillog">Email:</label><br>
                     <input type="email" name="emaillog" id="emaillog" class="form-control" style="max-width: 300px;" required><br>
                 </div>
+                
                 <div class="mb-3 mt-3">
                     <label class="form-label" for="password">Password:</label><br>
                     <input type="password" name="password" id="password" class="form-control" style="max-width: 300px;" required><br>
