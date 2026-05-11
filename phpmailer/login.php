@@ -15,6 +15,7 @@ if(empty($user)){
     session_start();
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_email'] = $user['email'];
+    $_SESSION['user_ruolo'] = $user['ruolo'];
         if($user['ruolo']==="user")
         header("Location: dashboard.php");
     else
