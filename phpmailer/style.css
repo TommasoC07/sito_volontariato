@@ -1,0 +1,27 @@
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+td, th {
+    vertical-align: middle;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.colonna-azioni {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.colonna-azioni form {
+    display: inline-block;
+    margin: 0 2px;
+}
+
+.colonna-azioni .btn {
+    display: inline-flex;
+    align-items: center;
+}
+
